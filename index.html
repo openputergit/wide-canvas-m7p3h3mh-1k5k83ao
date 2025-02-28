@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devanagari Font Switcher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        @font-face {
+            font-family: 'Noto Sans Devanagari';
+            src: url('https://fonts.gstatic.com/s/notosansdevanagari/v25/TuGoUUFzXI5FBtUq5a8bjKYTZjtRU6Sgv3NaV_SNmI0b8Q.woff2') format('woff2');
+        }
+        
+        @font-face {
+            font-family: 'Poppins';
+            src: url('https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecg.woff2') format('woff2');
+        }
+
+        .font-devanagari {
+            font-family: 'Noto Sans Devanagari', sans-serif;
+        }
+
+        .custom-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .font-selector {
+            transition: all 0.3s ease;
+        }
+
+        .font-selector:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-['Poppins']">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">देवनागरी फॉन्ट स्विचर</h1>
+            <p class="text-gray-600">Choose your preferred Devanagari font style</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Font Preview Cards -->
+            <div class="font-selector bg-white rounded-lg p-6 custom-shadow cursor-pointer" onclick="changeFont('Noto Sans Devanagari')">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">नोटो सैन्स देवनागरी</h3>
+                <p class="font-devanagari text-gray-700">नमस्ते! यह एक उदाहरण पाठ है।</p>
+            </div>
+
+            <div class="font-selector bg-white rounded-lg p-6 custom-shadow cursor-pointer" onclick="changeFont('Mangal')">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">मंगल</h3>
+                <p style="font-family: Mangal;" class="text-gray-700">नमस्ते! यह एक उदाहरण पाठ है।</p>
+            </div>
+
+            <div class="font-selector bg-white rounded-lg p-6 custom-shadow cursor-pointer" onclick="changeFont('Aparajita')">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">अपराजिता</h3>
+                <p style="font-family: Aparajita;" class="text-gray-700">नमस्ते! यह एक उदाहरण पाठ है।</p>
+            </div>
+        </div>
+
+        <!-- Text Input Area -->
+        <div class="mt-12">
+            <textarea id="textInput" 
+                      class="w-full h-48 p-4 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none"
+                      placeholder="Type or paste your text here..."></textarea>
+        </div>
+
+        <!-- Custom Font Upload -->
+        <div class="mt-8">
+            <label class="block mb-4 text-lg font-semibold text-gray-700">Upload Custom Font (.ttf)</label>
+            <input type="file" 
+                   id="fontUpload" 
+                   accept=".ttf"
+                   class="block w-full text-sm text-gray-500
+                          file:mr-4 file:py-2 file:px-4
+                          file:rounded-full file:border-0
+                          file:text-sm file:font-semibold
+                          file:bg-blue-50 file:text-blue-700
+                          hover:file:bg-blue-100"/>
+        </div>
+    </div>
+
+    <script>
+        let customFonts = {};
+
+        function changeFont(fontFamily) {
+            const textInput = document.getElementById('textInput');
+            textInput.style.fontFamily = fontFamily;
+        }
+
+        document.getElementById('fontUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const fontName = file.name.split('.')[0];
+                    const fontFace = new FontFace(fontName, e.target.result);
+                    
+                    fontFace.load().then(function(loadedFace) {
+                        document.fonts.add(loadedFace);
+                        customFonts[fontName] = loadedFace;
+                        
+                        // Create new font preview card
+                        createFontPreviewCard(fontName);
+                    }).catch(function(error) {
+                        alert('Error loading font: ' + error.message);
+                    });
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
+        function createFontPreviewCard(fontName) {
+            const container = document.querySelector('.grid');
+            const newCard = document.createElement('div');
+            
+            newCard.className = 'font-selector bg-white rounded-lg p-6 custom-shadow cursor-pointer';
+            newCard.onclick = () => changeFont(fontName);
+            newCard.innerHTML = `
+                <h3 class="text-xl font-bold mb-4 text-gray-800">${fontName}</h3>
+                <p style="font-family: ${fontName};" class="text-gray-700">नमस्ते! यह एक उदाहरण पाठ है।</p>
+            `;
+            
+            container.appendChild(newCard);
+        }
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
